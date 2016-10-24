@@ -65,10 +65,15 @@ send_msg(const char *msg, const char *key)
 {
 	int fd;
 	char cipher[BUFSIZ] = "+OK ";
+	char *nl;
 
+	if ((nl = strrchr(msg, '\n')) != NULL)	/* rm newline */
+		*nl = '\0';
 
 	if (encrypt_string(key, msg, cipher + 4, strlen(msg)) == 0)
 		errx(EXIT_FAILURE, "encrypt_string");
+
+	strlcat(cipher, "\n", sizeof cipher);
 
 	if ((fd = open("in", O_WRONLY)) == -1)
 		err(EXIT_FAILURE, "open");
@@ -113,7 +118,7 @@ main(int argc, char *argv[])
 #	define READ_FD 6
 #	define WRITE_FD 7
 
-	while ((ch = getopt(argc, argv, "d:h")) != -1) {
+	while ((ch = getopt(argc, argv, "d:n:h")) != -1) {
 		switch (ch) {
 		case 'd':
 			if ((dir = strdup(optarg)) == NULL)
