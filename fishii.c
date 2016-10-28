@@ -23,7 +23,6 @@ handle_input(char *buf, const char *key, int fd)
 			dprintf(fd, "%s\n", prompt);
 			continue;
 		}
-			
 
 		/* XXX: do length check */
 		if (*line == '>') {
@@ -132,15 +131,14 @@ main(int argc, char *argv[])
 {
 	int ch, out;
 	char *dir = ".";
-	size_t histlen = 5;
-	const char *errstr = NULL;
+	size_t size = 0;
 	char key[BUFSIZ];
 	bool all_flag = false;
 
 #	define READ_FD 6
 #	define WRITE_FD 7
 
-	while ((ch = getopt(argc, argv, "ad:n:h")) != -1) {
+	while ((ch = getopt(argc, argv, "ad:h")) != -1) {
 		switch (ch) {
 		case 'a':
 			all_flag = true;
@@ -148,11 +146,6 @@ main(int argc, char *argv[])
 		case 'd':
 			if ((dir = strdup(optarg)) == NULL)
 				err(EXIT_FAILURE, "strdup");
-			break;
-		case 'n':
-			histlen = strtonum(optarg, 0, LONG_MAX, &errstr);
-			if (errstr != NULL)
-				err(EXIT_FAILURE, "strtonum: %s", errstr);
 			break;
 		case 'h':
 		default:
@@ -170,9 +163,9 @@ main(int argc, char *argv[])
 
 	read_key(key, sizeof key);
 	if (all_flag) {
-		size_t size = print_content(key);
+		size = print_content(key);
 	}
-	out = open_out(size, histlen);
+	out = open_out(size);
 
 	/* fork frontend program */
 	char *prog = argv[0];
