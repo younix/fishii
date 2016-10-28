@@ -1,3 +1,4 @@
+#include <stdbool.h>
 #include <err.h>
 #include <fcntl.h>
 #include <limits.h>
@@ -85,13 +86,33 @@ send_msg(const char *msg, const char *key)
 		err(EXIT_FAILURE, "close");
 }
 
+size_t
+print_content(const char *key)
+{
+	size_t size = 0;
+	FILE *fh;
+	char buf[BUFSIZ];
+
+	if ((fh = fopen("out", "r")) == NULL)
+		err(EXIT_FAILURE, "fopen");
+
+	while (fgets(buf, sizeof buf, fh) == NULL) {
+		send_msg(buf, key);
+	}
+
+	if (fclose(fh) == EOF)
+		err(EXIT_FAILURE, "fclose");
+
+	return size;
+}
+
 int
 open_out(size_t histlen)
 {
 	char cmd[BUFSIZ];
 	FILE *fh;
 
-	snprintf(cmd, sizeof cmd, "tail -fn %zu out", histlen);
+	snprintf(cmd, sizeof cmd, "tail -fc %zu out", histlen);
 
 	if ((fh = popen(cmd, "r")) == NULL)
 		err(EXIT_FAILURE, "popen");
@@ -114,12 +135,16 @@ main(int argc, char *argv[])
 	size_t histlen = 5;
 	const char *errstr = NULL;
 	char key[BUFSIZ];
+	bool all_flag = false;
 
 #	define READ_FD 6
 #	define WRITE_FD 7
 
-	while ((ch = getopt(argc, argv, "d:n:h")) != -1) {
+	while ((ch = getopt(argc, argv, "ad:n:h")) != -1) {
 		switch (ch) {
+		case 'a':
+			all_flag = true;
+			break;
 		case 'd':
 			if ((dir = strdup(optarg)) == NULL)
 				err(EXIT_FAILURE, "strdup");
@@ -144,7 +169,10 @@ main(int argc, char *argv[])
 		err(EXIT_FAILURE, "chdir");
 
 	read_key(key, sizeof key);
-	out = open_out(histlen);
+	if (all_flag) {
+		size_t size = print_content(key);
+	}
+	out = open_out(size, histlen);
 
 	/* fork frontend program */
 	char *prog = argv[0];
