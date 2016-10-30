@@ -98,11 +98,8 @@ print_content(const char *key, int crypt_out)
 	if ((fh = fopen("out", "r")) == NULL)
 		err(EXIT_FAILURE, "fopen");
 
-	while (fgets(buf, sizeof buf, fh) != NULL) {
-		fputs(buf, stderr);
+	while (fgets(buf, sizeof buf, fh) != NULL)
 		handle_crypto(buf, key, crypt_out);
-//		send_msg(buf, key);
-	}
 
 	if (fclose(fh) == EOF)
 		err(EXIT_FAILURE, "fclose");

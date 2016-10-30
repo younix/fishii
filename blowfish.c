@@ -93,8 +93,8 @@ decrypt_string (const char *key, const char *str, char *dest, int len)
 
     /* length must be a multiple of BF_BLOCK encoded in base64 */
     if (len % (BF_BLOCK * 6 / 4) != 0) {
-        errx(1, "len %% (BF_BLOCK * 6 / 4) != 0");
-        return 0;
+        warnx("len %% (BF_BLOCK * 6 / 4) != 0: %d, %s", len, str);
+        len -= len % (BF_BLOCK * 6 / 4);
     }
 
     BF_set_key (&bf_key, strlen (key), (const unsigned char *) key);
