@@ -49,21 +49,6 @@ handle_crypto(char *buf, const char *key, int fd)
 }
 
 static void
-read_key(char *key, size_t size)
-{
-	FILE *fh;
-
-	if ((fh = fopen(".key", "r")) == NULL)
-		err(EXIT_FAILURE, "fopen");
-
-	if (fgets(key, size, fh) == NULL)
-		err(EXIT_FAILURE, "fgets");
-
-	if (fclose(fh) == EOF)
-		err(EXIT_FAILURE, "fclose");
-}
-
-static void
 handle_plain(const char *msg, const char *key)
 {
 	int fd;
@@ -86,6 +71,21 @@ handle_plain(const char *msg, const char *key)
 
 	if (close(fd) == -1)
 		err(EXIT_FAILURE, "close");
+}
+
+static void
+read_key(char *key, size_t size)
+{
+	FILE *fh;
+
+	if ((fh = fopen(".key", "r")) == NULL)
+		err(EXIT_FAILURE, "fopen");
+
+	if (fgets(key, size, fh) == NULL)
+		err(EXIT_FAILURE, "fgets");
+
+	if (fclose(fh) == EOF)
+		err(EXIT_FAILURE, "fclose");
 }
 
 static size_t
