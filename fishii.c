@@ -27,9 +27,8 @@ handle_crypto(char *buf, const char *key, int fd)
 
 		/* YYYY-MM-DD HH:MM <...> +OK ... */
 		line = strchr(line, '>');
-		if (line == NULL) {
+		if (line == NULL)
 			goto plain;
-		}
 
 		if ((line = strstr(line, " +OK ")) != NULL) { /* is encrypted */
 			char plain[BUFSIZ];
@@ -123,29 +122,6 @@ open_out(size_t histlen)
 }
 
 static void
-prepare_plain_folder(void)
-{
-	struct stat sb;
-
-	if (stat("plain", &sb) == -1) {
-		if (errno == ENOENT) {	/* create folder if it does not exist */
-			if (mkdir("plain", S_IRWXU) == -1)
-				err(EXIT_FAILURE, "stat");
-		} else {
-			err(EXIT_FAILURE, "stat");
-		}
-	} else {
-		/* TODO: check permissions here */
-	}
-
-	if (mkdir("plain", S_IRWXU) == -1 && errno != EEXIST)
-		err(EXIT_FAILURE, "mkfifo plain");
-
-	if (mkfifo("plain/in", S_IRUSR|S_IWUSR) == -1 && errno != EEXIST)
-		err(EXIT_FAILURE, "mkfifo plain/in");
-}
-
-static void
 usage(void)
 {
 	fputs("fishii [-h] [folder]\n", stderr);
@@ -178,7 +154,10 @@ main(int argc, char *argv[])
 		err(EXIT_FAILURE, "chdir");
 
 	/* prepare and open plain/{in,out} */
-	prepare_plain_folder();
+	if (mkdir("plain", S_IRWXU) == -1 && errno != EEXIST)
+		err(EXIT_FAILURE, "mkfifo plain");
+	if (mkfifo("plain/in", S_IRUSR|S_IWUSR) == -1 && errno != EEXIST)
+		err(EXIT_FAILURE, "mkfifo plain/in");
 	if ((plain_in = open("plain/in", O_RDONLY|O_NONBLOCK)) == -1)
 		err(EXIT_FAILURE, "open plain/in");
 	if ((plain_out = open("plain/out", O_WRONLY|O_CREAT|O_TRUNC,
