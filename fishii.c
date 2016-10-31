@@ -21,30 +21,31 @@ handle_crypto(char *buf, const char *key, int fd)
 	while ((line = strsep(&buf, "\n")) != NULL) {
 		char *prompt = line;
 
+		/* YYYY-MM-DD HH:MM -!- ... */
+		if (line[17] == '-')
+			goto plain;
+
+		/* YYYY-MM-DD HH:MM <...> +OK ... */
 		line = strchr(line, '>');
 		if (line == NULL) {
-			dprintf(fd, "%s\n", prompt);
-			continue;
+			goto plain;
 		}
 
-		/* XXX: do length check */
-		if (*line == '>') {
-			++line;
-			*line = '\0';
-			++line;
-		}
-
-		if (strncmp(line, "+OK ", 4) == 0) { /* is encrypted */
+		if ((line = strstr(line, " +OK ")) != NULL) { /* is encrypted */
 			char plain[BUFSIZ];
-			line += 4;
+
+			*line = '\0';	/* split string */
+			line += 5;
 
 			if (decrypt_string(key, line, plain, strlen(line)) == 0)
 				errx(EXIT_FAILURE, "decrypt_string");
 
 			dprintf(fd, "%s %s", prompt, plain);
-		} else {
-			dprintf(fd, "%s +p %s", prompt, line);
+			continue;
 		}
+ plain:
+		dprintf(fd, "%s%s", prompt,
+		    prompt[strlen(prompt) - 1] != '\n' ? "\n": "");
 	}
 }
 
