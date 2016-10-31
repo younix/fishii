@@ -7,7 +7,7 @@ The origin of the blowfish.c implementation is taken from
 
 ## Design
 
-![FiSHii](graph.svg "Design graph of FiSHii")
+![FiSHii](https://raw.githubusercontent.com/younix/fishii/master/graph.svg "Design graph of FiSHii")
 
 ## Requirements
 
