@@ -13,7 +13,7 @@
 
 #include "blowfish.h"
 
-void
+static void
 handle_crypto(char *buf, const char *key, int fd)
 {
 	char *line;
@@ -49,7 +49,7 @@ handle_crypto(char *buf, const char *key, int fd)
 	}
 }
 
-void
+static void
 read_key(char *key, size_t size)
 {
 	FILE *fh;
@@ -64,7 +64,7 @@ read_key(char *key, size_t size)
 		err(EXIT_FAILURE, "fclose");
 }
 
-void
+static void
 handle_plain(const char *msg, const char *key)
 {
 	int fd;
@@ -89,7 +89,7 @@ handle_plain(const char *msg, const char *key)
 		err(EXIT_FAILURE, "close");
 }
 
-size_t
+static size_t
 print_content(const char *key, int crypt_out)
 {
 	size_t size = 0;
@@ -108,7 +108,7 @@ print_content(const char *key, int crypt_out)
 	return size;
 }
 
-int
+static int
 open_out(size_t histlen)
 {
 	char cmd[BUFSIZ];
@@ -122,7 +122,7 @@ open_out(size_t histlen)
 	return fileno(fh);
 }
 
-void
+static void
 prepare_plain_folder(void)
 {
 	struct stat sb;
@@ -145,7 +145,7 @@ prepare_plain_folder(void)
 		err(EXIT_FAILURE, "mkfifo plain/in");
 }
 
-void
+static void
 usage(void)
 {
 	fputs("fishii [-h] [folder]\n", stderr);
