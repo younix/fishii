@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.0//EN" "http://www.w3.org/TR/2001/PR-SVG-20010719/DTD/svg10.dtd">
+<svg width="16cm" height="3cm" viewBox="365 228 310 43" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+  <g>
+    <rect style="fill: #729fcf" x="450" y="230" width="100" height="40"/>
+    <rect style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #ffffff" x="450" y="230" width="100" height="40"/>
+    <text font-size="16.9333" style="fill: #ffffff;text-anchor:middle;font-family:sans-serif;font-style:normal;font-weight:700" x="500" y="255.167">
+      <tspan x="500" y="255.167">FiSHii</tspan>
+    </text>
+  </g>
+  <text font-size="12.9822" style="fill: #000000;text-anchor:end;font-family:sans-serif;font-style:normal;font-weight:700" x="390" y="244.5">
+    <tspan x="390" y="244.5">in</tspan>
+  </text>
+  <text font-size="12.9822" style="fill: #000000;text-anchor:start;font-family:sans-serif;font-style:normal;font-weight:700" x="610" y="264.5">
+    <tspan x="610" y="264.5">plain/out</tspan>
+  </text>
+  <text font-size="12.9822" style="fill: #000000;text-anchor:start;font-family:sans-serif;font-style:normal;font-weight:700" x="610" y="244.5">
+    <tspan x="610" y="244.5">plain/in</tspan>
+  </text>
+  <text font-size="12.9822" style="fill: #000000;text-anchor:end;font-family:sans-serif;font-style:normal;font-weight:700" x="390" y="264.5">
+    <tspan x="390" y="264.5">out</tspan>
+  </text>
+  <g>
+    <line style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x1="440" y1="240" x2="401" y2="240"/>
+    <polygon style="fill: #000000" points="401,235 391,240 401,245 "/>
+    <polygon style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="401,235 391,240 401,245 "/>
+  </g>
+  <g>
+    <line style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x1="600" y1="240" x2="561" y2="240"/>
+    <polygon style="fill: #000000" points="561,235 551,240 561,245 "/>
+    <polygon style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="561,235 551,240 561,245 "/>
+  </g>
+  <g>
+    <line style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x1="400" y1="260" x2="439" y2="260"/>
+    <polygon style="fill: #000000" points="439,265 449,260 439,255 "/>
+    <polygon style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="439,265 449,260 439,255 "/>
+  </g>
+  <g>
+    <line style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" x1="560" y1="260" x2="599" y2="260"/>
+    <polygon style="fill: #000000" points="599,265 609,260 599,255 "/>
+    <polygon style="fill: none; fill-opacity:0; stroke-width: 2; stroke: #000000" points="599,265 609,260 599,255 "/>
+  </g>
+</svg>

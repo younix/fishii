@@ -8,3 +8,6 @@ fishii: fishii.c blowfish.c
 
 clean:
 	rm -f fishii
+
+graph.svg: graph.dia
+	dia --export=$@ --filter=svg graph.dia
