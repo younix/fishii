@@ -78,6 +78,8 @@ read_key(char *key, size_t size)
 {
 	FILE *fh;
 
+	/* TODO: check permissions of the key file */
+
 	if ((fh = fopen(".key", "r")) == NULL)
 		err(EXIT_FAILURE, "fopen");
 
@@ -86,39 +88,6 @@ read_key(char *key, size_t size)
 
 	if (fclose(fh) == EOF)
 		err(EXIT_FAILURE, "fclose");
-}
-
-static size_t
-print_content(const char *key, int crypt_out)
-{
-	size_t size = 0;
-	FILE *fh;
-	char buf[BUFSIZ];
-
-	if ((fh = fopen("out", "r")) == NULL)
-		err(EXIT_FAILURE, "fopen");
-
-	while (fgets(buf, sizeof buf, fh) != NULL)
-		handle_crypto(buf, key, crypt_out);
-
-	if (fclose(fh) == EOF)
-		err(EXIT_FAILURE, "fclose");
-
-	return size;
-}
-
-static int
-open_out(size_t histlen)
-{
-	char cmd[BUFSIZ];
-	FILE *fh;
-
-	snprintf(cmd, sizeof cmd, "tail -fc %zu out", histlen);
-
-	if ((fh = popen(cmd, "r")) == NULL)
-		err(EXIT_FAILURE, "popen");
-
-	return fileno(fh);
 }
 
 static void
@@ -134,8 +103,8 @@ main(int argc, char *argv[])
 	int ch;
 	int crypt_out, plain_in, plain_out;
 	char *dir = ".";
-	size_t size = 0;
 	char key[BUFSIZ];
+	FILE *fh;
 
 	while ((ch = getopt(argc, argv, "h")) != -1) {
 		switch (ch) {
@@ -163,10 +132,10 @@ main(int argc, char *argv[])
 	if ((plain_out = open("plain/out", O_WRONLY|O_CREAT|O_TRUNC,
 	    S_IRUSR|S_IWUSR)) == -1)
 		err(EXIT_FAILURE, "open plain/out");
-
+	if ((fh = popen("tail -f -c +0 out", "r")) == NULL)
+		err(EXIT_FAILURE, "popen");
+	crypt_out = fileno(fh);
 	read_key(key, sizeof key);
-	size = print_content(key, plain_out);
-	crypt_out = open_out(size);
 
 	struct pollfd pfd[2];
 	pfd[0].fd = plain_in;
@@ -205,13 +174,13 @@ main(int argc, char *argv[])
 		}
 
 		if (pfd[1].revents & POLLIN) {	/* out -> here -> plain/out */
-			char buf[BUFSIZ];
+			char buf[BUFSIZ + 1];
 			if ((n = read(crypt_out, buf, sizeof buf)) == -1)
 				err(EXIT_FAILURE, "read");
 			if (n == 0)
 				break;
 			buf[n] = '\0';
-			handle_crypto(buf, key, crypt_out);
+			handle_crypto(buf, key, plain_out);
 		}
 	}
 
