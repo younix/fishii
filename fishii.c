@@ -13,13 +13,24 @@
 
 #include "blowfish.h"
 
-static void
+static size_t
 handle_crypto(char *buf, const char *key, int fd)
 {
 	char *line;
+	char *next = buf;
 
-	while ((line = strsep(&buf, "\n")) != NULL) {
+	while ((line = strsep(&next, "\n")) != NULL) {
 		char *prompt = line;
+
+		/* ignore empty lines */
+		if (line[0] == '\n' || line[0] == '\0')
+			continue;
+
+		/* handle incomplete lines in the next read-turn */
+		if (next == NULL) {
+			memmove(buf, line, strlen(line));
+			return strlen(line);
+		}
 
 		/* YYYY-MM-DD HH:MM -!- ... */
 		if (line[17] == '-')
@@ -39,13 +50,14 @@ handle_crypto(char *buf, const char *key, int fd)
 			if (decrypt_string(key, line, plain, strlen(line)) == 0)
 				errx(EXIT_FAILURE, "decrypt_string");
 
-			dprintf(fd, "%s %s", prompt, plain);
+			dprintf(fd, "%s %s\n", prompt, plain);
 			continue;
 		}
  plain:
-		dprintf(fd, "%s%s", prompt,
-		    prompt[strlen(prompt) - 1] != '\n' ? "\n": "");
+		dprintf(fd, "%s\n", prompt);
 	}
+
+	return 0;
 }
 
 static void
@@ -132,7 +144,7 @@ main(int argc, char *argv[])
 	if ((plain_out = open("plain/out", O_WRONLY|O_CREAT|O_TRUNC,
 	    S_IRUSR|S_IWUSR)) == -1)
 		err(EXIT_FAILURE, "open plain/out");
-	if ((fh = popen("tail -f -c +0 out", "r")) == NULL)
+	if ((fh = popen("exec tail -f -c +0 out", "r")) == NULL)
 		err(EXIT_FAILURE, "popen");
 	crypt_out = fileno(fh);
 	read_key(key, sizeof key);
@@ -173,14 +185,22 @@ main(int argc, char *argv[])
 			pfd[0].fd = plain_in;
 		}
 
+		/* handle backend error and its broken pipe */
+		if (pfd[1].revents & POLLHUP)
+			break;
+
 		if (pfd[1].revents & POLLIN) {	/* out -> here -> plain/out */
-			char buf[BUFSIZ + 1];
-			if ((n = read(crypt_out, buf, sizeof buf)) == -1)
+			static char buf[BUFSIZ];
+			static size_t off = 0;
+
+			n = read(crypt_out, buf + off, sizeof(buf) - off - 1);
+			if (n == -1)
 				err(EXIT_FAILURE, "read");
 			if (n == 0)
 				break;
-			buf[n] = '\0';
-			handle_crypto(buf, key, plain_out);
+			buf[n + off] = '\0';
+
+			off = handle_crypto(buf, key, plain_out);
 		}
 	}
 
