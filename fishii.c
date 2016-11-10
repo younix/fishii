@@ -180,7 +180,7 @@ main(int argc, char *argv[])
 			/* reopen */
 			if (close(plain_in) == -1)
 				err(EXIT_FAILURE, "close");
-			if ((plain_in = open("plain/in", O_RDONLY)) == -1)
+			if ((plain_in = open("plain/in", O_RDONLY|O_NONBLOCK)) == -1)
 				err(EXIT_FAILURE, "open");
 			pfd[0].fd = plain_in;
 		}
