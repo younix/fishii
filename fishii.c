@@ -171,18 +171,18 @@ main(int argc, char *argv[])
 
 			if ((n = read(plain_in, buf, PIPE_BUF)) == -1)
 				err(EXIT_FAILURE, "read");
-			if (n == 0)
-				break;
+
+			if (n == 0) {	/* pipe was closed */
+				if (close(plain_in) == -1)
+					err(EXIT_FAILURE, "close");
+				if ((plain_in = open("plain/in", O_RDONLY|O_NONBLOCK)) == -1)
+					err(EXIT_FAILURE, "open");
+				pfd[0].fd = plain_in;
+				continue;
+			}
 
 			buf[n] = '\0';
 			handle_plain(buf, key);
-
-			/* reopen */
-			if (close(plain_in) == -1)
-				err(EXIT_FAILURE, "close");
-			if ((plain_in = open("plain/in", O_RDONLY|O_NONBLOCK)) == -1)
-				err(EXIT_FAILURE, "open");
-			pfd[0].fd = plain_in;
 		}
 
 		/* handle backend error and its broken pipe */
