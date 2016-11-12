@@ -76,13 +76,13 @@ handle_plain(const char *msg, const char *key)
 	strlcat(cipher, "\n", sizeof cipher);
 
 	if ((fd = open("in", O_WRONLY)) == -1)
-		err(EXIT_FAILURE, "open");
+		err(EXIT_FAILURE, "open in");
 
 	if (write(fd, cipher, strlen(cipher)) == -1)
-		err(EXIT_FAILURE, "write");
+		err(EXIT_FAILURE, "write in");
 
 	if (close(fd) == -1)
-		err(EXIT_FAILURE, "close");
+		err(EXIT_FAILURE, "close in");
 }
 
 static void
@@ -93,13 +93,13 @@ read_key(char *key, size_t size)
 	/* TODO: check permissions of the key file */
 
 	if ((fh = fopen(".key", "r")) == NULL)
-		err(EXIT_FAILURE, "fopen");
+		err(EXIT_FAILURE, "fopen .key");
 
 	if (fgets(key, size, fh) == NULL)
-		err(EXIT_FAILURE, "fgets");
+		err(EXIT_FAILURE, "fgets .key");
 
 	if (fclose(fh) == EOF)
-		err(EXIT_FAILURE, "fclose");
+		err(EXIT_FAILURE, "fclose .key");
 }
 
 static void
