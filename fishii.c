@@ -169,8 +169,11 @@ main(int argc, char *argv[])
 		if (pfd[0].revents & POLLIN) {	/* in <- here <- plain/in */
 			char buf[PIPE_BUF + 1];
 
-			if ((n = read(plain_in, buf, PIPE_BUF)) == -1)
-				err(EXIT_FAILURE, "read");
+			if ((n = read(plain_in, buf, PIPE_BUF)) == -1) {
+				if (errno == EAGAIN)
+					continue;
+				err(EXIT_FAILURE, "read plain/in");
+			}
 
 			if (n == 0) {	/* pipe was closed */
 				if (close(plain_in) == -1)
@@ -178,11 +181,10 @@ main(int argc, char *argv[])
 				if ((plain_in = open("plain/in", O_RDONLY|O_NONBLOCK)) == -1)
 					err(EXIT_FAILURE, "open");
 				pfd[0].fd = plain_in;
-				continue;
+			} else {
+				buf[n] = '\0';
+				handle_plain(buf, key);
 			}
-
-			buf[n] = '\0';
-			handle_plain(buf, key);
 		}
 
 		/* handle backend error and its broken pipe */
