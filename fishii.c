@@ -16,7 +16,7 @@
 static size_t
 handle_crypto(char *buf, const char *key, int fd)
 {
-	char *line;
+	char *line, *sp;
 	char *next = buf;
 
 	while ((line = strsep(&next, "\n")) != NULL) {
@@ -32,13 +32,13 @@ handle_crypto(char *buf, const char *key, int fd)
 			return strlen(line);
 		}
 
-		/* YYYY-MM-DD HH:MM -!- ... */
-		if (line[17] == '-')
-			goto plain;
+		/* 1504360730 -!- ... */
+		if ((sp = strchr(line, ' ')) != NULL)
+			if (strncmp(sp, " -!-", 4) == 0)
+				goto plain;
 
-		/* YYYY-MM-DD HH:MM <...> +OK ... */
-		line = strchr(line, '>');
-		if (line == NULL)
+		/* 1504360730 <...> +OK ... */
+		if ((line = strchr(line, '>')) == NULL)
 			goto plain;
 
 		if ((line = strstr(line, " +OK ")) != NULL) { /* is encrypted */
